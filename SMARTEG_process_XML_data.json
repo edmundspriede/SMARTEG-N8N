@@ -1,0 +1,201 @@
+{
+  "name": "SMARTEG process XML",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ebff07c9-eb5d-49b5-878f-12e5c9973a97",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        460,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://stage.smarteg.lv/output3.xml",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "2bbbd203-f783-4e33-9450-9c4cd52fc2c5",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        740,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "0GpElT7VMTBdIqmm",
+        "options": {}
+      },
+      "id": "5df5907f-e553-4ba3-a547-62553d207a7e",
+      "name": "Update product",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        860,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "b8369363-32b0-4411-af27-7b695068b88b",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        780
+      ],
+      "webhookId": "07cdf278-67f8-423e-bb2b-e2b3a5ccbe76"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f0f32178-5810-47e6-8bb8-b54beed63e7d",
+      "name": "XML",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        980,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "root.item",
+        "options": {}
+      },
+      "id": "295a000b-d36e-4a70-be45-6b73ae155320",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "ede9401d-a186-49f6-99bc-b17a27c8fb12",
+      "name": "Smarteg items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        460,
+        780
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update product": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Smarteg items": {
+      "main": [
+        [
+          {
+            "node": "Update product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Smarteg items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Smarteg items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "13110564-6467-4171-992b-aba3db28279e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0f064bae8ef402bc77bc2dfa9bf8ed7b60d49005d687ffae7941232c8a9d8d44"
+  },
+  "id": "lqf5BFL8FVgJi9Sf",
+  "tags": [
+    {
+      "createdAt": "2024-02-13T07:41:07.450Z",
+      "updatedAt": "2024-02-13T07:41:07.450Z",
+      "id": "elVM40b1kztO2vne",
+      "name": "smarteg"
+    }
+  ]
+}

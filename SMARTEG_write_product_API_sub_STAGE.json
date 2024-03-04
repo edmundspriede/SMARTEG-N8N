@@ -1,0 +1,789 @@
+{
+  "name": "SMARTEG write product API sub STAGE",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.statusCode }}",
+              "operation": "equal",
+              "value2": 400
+            }
+          ]
+        }
+      },
+      "id": "be142abc-f217-41fc-ad15-f8dc67cff387",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        360,
+        480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0f56ae8a-e47e-46fe-b27e-598d69b5f8aa",
+      "name": "Smarteg items",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        340
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://stage.smarteg.lv/wp-json/wc/v3/products",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n  \"name\": {{ JSON.stringify($('Smarteg items').item.json.name_en )}} ,\n  \"description\" :  {{ JSON.stringify($('Smarteg items').item.json.long_description_en )}} ,\n  \"short_description\" :  {{ JSON.stringify($('Smarteg items').item.json.short_description_en )}} ,\n  \"sku\" : \"{{ $('Smarteg items').item.json.sku  }}\" , \n  \"price\" : \"{{ $('Smarteg items').item.json.price_tax_excl }}\" ,\n  \"regular_price\" : \"{{ $('Smarteg items').item.json.price_tax_excl }}\" ,\n  \"sale_price\" : \"{{ $('Smarteg items').item.json.sales_percentage }}\" ,\n  \"date_on_sale_from\" : \"{{  $('Smarteg items').item.json.sales_start_date }}\",\n  \"date_on_sale_to\" : \"{{  $('Smarteg items').item.json.sales_end_date }}\",\n  \"stock\" : \"{{ $('Smarteg items').item.json.stock }}\",\n  \"weight\" : \"{{ $('Smarteg items').item.json[\"weight_kg\"]}}\",\n  \"length\" : \"{{  $('Smarteg items').item.json[\"length_cm\"] }}\",\n  \"width\" : \"{{  $('Smarteg items').item.json[\"width_cm\"] }}\",\n  \"height\" : \"{{  $('Smarteg items').item.json[\"height_cm\"] }}\",\n  \"attributes\" :  {{ JSON.stringify($('Attrs Categs').item.json.attrs )}} ,\n  \"images\" : [{ \"src\" : {{ JSON.stringify($('Smarteg items').item.json.image_url )}} }],\n  \"categories\" :  [ {{ $json.concatenated_cat }} ]\n }",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "17821b10-4c96-4f57-806d-f339f2f155e7",
+      "name": "Try New",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        160,
+        480
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YvCje8MkdyjGqopm",
+          "name": "Stage"
+        }
+      },
+      "notes": "New"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://stage.smarteg.lv/wp-json/wc/v3/products/{{ $json.body.data.resource_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"{{ $('Smarteg items').item.json.published == 0 ? \"draft\" : \"published\"  }}\",\n  \"price\" : \"{{ $('Smarteg items').item.json.price_tax_excl }}\" ,\n  \"regular_price\" : \"{{ $('Smarteg items').item.json.price_tax_excl }}\" ,\n  \"sale_price\" : \"{{ $('Smarteg items').item.json.sales_percentage }}\" ,\n  \"date_on_sale_from\" : \"{{  $('Smarteg items').item.json.sales_start_date }}\",\n  \"date_on_sale_to\" : \"{{  $('Smarteg items').item.json.sales_end_date }}\",\n  \"stock\" : \"{{ $('Smarteg items').item.json.stock }}\"\n\n }",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "a504d86e-fbb1-4992-ba42-04874f15de08",
+      "name": "Update EN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        600,
+        320
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YvCje8MkdyjGqopm",
+          "name": "Stage"
+        }
+      },
+      "notes": "Update"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://stage.smarteg.lv/wp-json/wc/v3/products/{{ $json.body.translations.lv }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n  \"name\": {{ JSON.stringify($('Smarteg items').item.json.name_lv )}} ,\n  \"description\" :  {{ JSON.stringify($('Smarteg items').item.json.long_description_lv )}} ,\n  \"short_description\" :  {{ JSON.stringify($('Smarteg items').item.json.short_description_lv )}} \n\n }",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "ca611ce0-d591-4955-8cb6-a489e28b0f6c",
+      "name": "Update LV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        880,
+        220
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YvCje8MkdyjGqopm",
+          "name": "Stage"
+        }
+      },
+      "notes": "Update"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://stage.smarteg.lv/wp-json/wc/v3/products/{{ $json.body.translations.ru }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n  \"name\": {{ JSON.stringify($('Smarteg items').item.json.name_ru )}} ,\n  \"description\" :  {{ JSON.stringify($('Smarteg items').item.json.long_description_ru )}} ,\n  \"short_description\" :  {{ JSON.stringify($('Smarteg items').item.json.short_description_ru )}} \n\n }",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "f4e9e356-6f9d-4205-8609-f7c8debb0a17",
+      "name": "Update RU",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        880,
+        440
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YvCje8MkdyjGqopm",
+          "name": "Stage"
+        }
+      },
+      "notes": "Update"
+    },
+    {
+      "parameters": {
+        "include": "none",
+        "options": {}
+      },
+      "id": "54b450cc-911c-4ae2-8dd2-a32c2f6584b9",
+      "name": "Reset",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.1,
+      "position": [
+        1080,
+        720
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://stage.smarteg.lv/wp-json/wc/v3/products",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n  \"name\": {{ JSON.stringify($('Smarteg items').item.json.name_lv )}} ,\n  \"description\" :  {{ JSON.stringify($('Smarteg items').item.json.long_description_lv )}} ,\n  \"short_description\" :  {{ JSON.stringify($('Smarteg items').item.json.short_description_lv )}} ,\n  \"translation_of\" : {{ $json.body.id }},\n  \"lang\" : \"lv\"\n }",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "74cf26f3-3e5c-4ad7-a2a8-a4ce7e26533c",
+      "name": "New LV",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        600,
+        640
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YvCje8MkdyjGqopm",
+          "name": "Stage"
+        }
+      },
+      "notes": "New"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://stage.smarteg.lv/wp-json/wc/v3/products",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n  \"name\": {{ JSON.stringify($('Smarteg items').item.json.name_ru )}} ,\n  \"description\" :  {{ JSON.stringify($('Smarteg items').item.json.long_description_ru )}} ,\n  \"short_description\" :  {{ JSON.stringify($('Smarteg items').item.json.short_description_ru )}} ,\n  \"translation_of\" : {{ $json.body.id }},\n  \"lang\" : \"ru\"\n }",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10
+            }
+          },
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "5ceb633d-3923-4b0c-8eed-e2d00aa54b3f",
+      "name": "New RU",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        600,
+        820
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "YvCje8MkdyjGqopm",
+          "name": "Stage"
+        }
+      },
+      "notes": "New"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\nconst attrs = [];\n\nif ($input.item.json.attribute_list_e) {\n\n  const attribute_list =  JSON.parse($input.item.json.attribute_list_en);\n\n  for (attr in attribute_list) {\n\n    \n   switch (attr) {\n\n     case  'Connection type' : attrs.push( { \"id\" : 6 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } ); break;\n     case  'Light color' : attrs.push( { \"id\" : 1 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;\n     case  'Brand' : attrs.push( { \"id\" : 2 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;  \n     case  'App' : attrs.push( { \"id\" : 4 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;\n     case  'Connection protocol' : attrs.push( { \"id\" : 4 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;\n     case  'Body color' : attrs.push( { \"id\" : 4 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;\n     case  'Body type' : attrs.push( { \"id\" : 22 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break; \n     case  'Button count' : attrs.push( { \"id\" : 21 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;  \n     case  'Camera resolution' : attrs.push( { \"id\" : 12 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break;\n     case  'Capacity' : attrs.push( { \"id\" : 19 , \"options\" :  [ attribute_list[attr] ] , \"visible\" : true } );  break; \n       \n   }\n  }\n}\n\n\n\n$input.item.json.attrs = attrs;\n\ncategsslug = [];\ncategs =  JSON.parse($input.item.json.full_category_en);\n\nfor (cat in categs) {\n  console.log(cat);\n\n  let sanitizedCat = categs[cat].toLowerCase().replace(/[^\\w\\s]/gi, '').replace(/\\s+/g, '-');\n  console.log(sanitizedCat);\n     \n  categsslug.push({ 'slug'  : sanitizedCat, \"name\" :  categs[cat]  }) ; \n         \n  \n}  \n\n$input.item.json.categs = categsslug;\n\n\n\nreturn $input.item;"
+      },
+      "id": "4b312f10-e85f-485a-93fb-b79062933d2d",
+      "name": "Attrs Categs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -340,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "categs",
+        "options": {}
+      },
+      "id": "f75594f9-08f1-42e8-948c-07296bcc666a",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://stage.smarteg.lv/wp-json/wc/v3/products/categories",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "slug",
+              "value": "={{ $json.name }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "a9b7df57-c6cd-4615-b1ff-aa3b9bb3e0c3",
+      "name": "Read categ1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -780,
+        760
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "gRuvCPq3H1HPqVXE",
+          "name": "smarteg"
+        }
+      },
+      "notes": "New"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "3fafc39a-05b8-4619-b561-6dfd60f47bd6",
+              "leftValue": "={{ $json.body[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "13f0e218-041c-4070-aeec-d46ac15bef89",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        760
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "30af1766-a03f-4fd3-9762-2afe5566c4dc",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        -100,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://stage.smarteg.lv/wp-json/wc/v3/products/categories",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $('Split Out').item.json.name }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "cdbe3eca-88aa-4c09-b3b2-3d002cd41e56",
+      "name": "New categ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -520,
+        1000
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "gRuvCPq3H1HPqVXE",
+          "name": "smarteg"
+        }
+      },
+      "notes": "New"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d649bc48-5994-4de4-acca-3c6cc007d144",
+              "name": "id",
+              "value": "={{ $json.body[0].id }} ",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "28e6edc0-1eac-48ac-b3a1-190d2f3cbebc",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -320,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d649bc48-5994-4de4-acca-3c6cc007d144",
+              "name": "id",
+              "value": "={{ $json.body.id }} ",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "815c4b3f-35ca-45e1-91e0-3a7bfd9956db",
+      "name": "Edit Fields2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -320,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c50de19-80e9-4a64-8fab-52a96e98fc55",
+              "name": "cat",
+              "value": "={ \"id\" : {{ $json.id }} }",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c44919d5-95a3-4860-b318-c15f076105fd",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        40,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "cat"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "53bef4c1-2cfd-4a97-8a19-c91f0bd10c41",
+      "name": "Categs",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        160,
+        760
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Update EN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New LV",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "New RU",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Smarteg items": {
+      "main": [
+        [
+          {
+            "node": "Attrs Categs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update EN": {
+      "main": [
+        [
+          {
+            "node": "Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update RU": {
+      "main": [
+        [
+          {
+            "node": "Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update LV": {
+      "main": [
+        [
+          {
+            "node": "Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New LV": {
+      "main": [
+        [
+          {
+            "node": "Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New RU": {
+      "main": [
+        [
+          {
+            "node": "Reset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attrs Categs": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Read categ1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read categ1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New categ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New categ": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Categs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Try New": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categs": {
+      "main": [
+        [
+          {
+            "node": "Try New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6ec03497-ba9e-4010-8c2f-a838a2e42e49",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0f064bae8ef402bc77bc2dfa9bf8ed7b60d49005d687ffae7941232c8a9d8d44"
+  },
+  "id": "XIlx37suFs7RpXu0",
+  "tags": [
+    {
+      "createdAt": "2024-02-13T07:41:07.450Z",
+      "updatedAt": "2024-02-13T07:41:07.450Z",
+      "id": "elVM40b1kztO2vne",
+      "name": "smarteg"
+    }
+  ]
+}
